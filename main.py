@@ -11,6 +11,24 @@ import datetime
 import random
 import re
 import aiohttp
+# --- KOYEB HEALTH CHECK FIX ---
+from threading import Thread
+from http.server import HTTPServer, BaseHTTPRequestHandler
+
+class HealthHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"OK")
+
+def run_health_server():
+    try:
+        HTTPServer(("0.0.0.0", 8000), HealthHandler).serve_forever()
+    except Exception as e:
+        print("Health server error:", e)
+
+Thread(target=run_health_server, daemon=True).start()
+# --- KOYEB HEALTH CHECK FIX ---
 
 # --- AYARLAR ---
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -419,3 +437,4 @@ async def on_ready():
         except: pass
 
 if __name__ == "__main__": bot.run(TOKEN)
+
